@@ -1,4 +1,4 @@
-module github.com/globocom/go-buffer/v2
+module github.com/omniboost/go-buffer
 
 go 1.24
 

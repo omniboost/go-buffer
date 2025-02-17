@@ -3,11 +3,11 @@ package buffer_test
 import (
 	"testing"
 
-	"github.com/globocom/go-buffer/v2"
+	"github.com/omniboost/go-buffer"
 )
 
 func BenchmarkBuffer(b *testing.B) {
-	noop := buffer.FlusherFunc(func([]interface{}) {})
+	noop := buffer.FlusherFunc[any](func([]any) {})
 
 	b.Run("push only", func(b *testing.B) {
 		sut := buffer.New(

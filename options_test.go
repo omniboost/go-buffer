@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/globocom/go-buffer/v2"
+	"github.com/omniboost/go-buffer"
 )
 
 var _ = Describe("Options", func() {
@@ -27,7 +27,7 @@ var _ = Describe("Options", func() {
 		flusher := func(items []interface{}) {}
 
 		// act
-		buffer.WithFlusher(buffer.FlusherFunc(flusher))(opts)
+		buffer.WithFlusher(buffer.FlusherFunc[any](flusher))(opts)
 
 		// assert
 		Expect(opts.Flusher).NotTo(BeNil())
