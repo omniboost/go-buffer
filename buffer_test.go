@@ -41,7 +41,7 @@ var _ = Describe("Buffer", func() {
 				Expect(func() {
 					buffer.New(
 						buffer.WithSize(1),
-						buffer.WithFlusher(nil),
+						buffer.WithFlusher[any](nil),
 					)
 				}).To(Panic())
 			})

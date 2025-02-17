@@ -14,63 +14,53 @@ const (
 )
 
 type (
-	// Configuration options.
-	Options struct {
-		Size          uint
-		Flusher       Flusher
-		FlushInterval time.Duration
-		PushTimeout   time.Duration
-		FlushTimeout  time.Duration
-		CloseTimeout  time.Duration
-	}
-
 	// Option setter.
-	Option func(*Options)
+	Option[T any] func(*Buffer[T])
 )
 
 // WithSize sets the size of the buffer.
-func WithSize(size uint) Option {
-	return func(options *Options) {
+func WithSize(size uint) Option[any] {
+	return func(options *Buffer[any]) {
 		options.Size = size
 	}
 }
 
 // WithFlusher sets the flusher that should be used to write out the buffer.
-func WithFlusher(flusher Flusher) Option {
-	return func(options *Options) {
+func WithFlusher[T any](flusher Flusher[T]) Option[T] {
+	return func(options *Buffer[T]) {
 		options.Flusher = flusher
 	}
 }
 
 // WithFlushInterval sets the interval between automatic flushes.
-func WithFlushInterval(interval time.Duration) Option {
-	return func(options *Options) {
+func WithFlushInterval(interval time.Duration) Option[any] {
+	return func(options *Buffer[any]) {
 		options.FlushInterval = interval
 	}
 }
 
 // WithPushTimeout sets how long a push should wait before giving up.
-func WithPushTimeout(timeout time.Duration) Option {
-	return func(options *Options) {
+func WithPushTimeout(timeout time.Duration) Option[any] {
+	return func(options *Buffer[any]) {
 		options.PushTimeout = timeout
 	}
 }
 
 // WithFlushTimeout sets how long a manual flush should wait before giving up.
-func WithFlushTimeout(timeout time.Duration) Option {
-	return func(options *Options) {
+func WithFlushTimeout(timeout time.Duration) Option[any] {
+	return func(options *Buffer[any]) {
 		options.FlushTimeout = timeout
 	}
 }
 
 // WithCloseTimeout sets how long
-func WithCloseTimeout(timeout time.Duration) Option {
-	return func(options *Options) {
+func WithCloseTimeout(timeout time.Duration) Option[any] {
+	return func(options *Buffer[any]) {
 		options.CloseTimeout = timeout
 	}
 }
 
-func validateOptions(options *Options) error {
+func validateBuffer[T any](options *Buffer[T]) error {
 	if options.Size == 0 {
 		return errors.New(invalidSize)
 	}
@@ -91,25 +81,4 @@ func validateOptions(options *Options) error {
 	}
 
 	return nil
-}
-
-func resolveOptions(opts ...Option) *Options {
-	options := &Options{
-		Size:          0,
-		Flusher:       nil,
-		FlushInterval: 0,
-		PushTimeout:   time.Second,
-		FlushTimeout:  time.Second,
-		CloseTimeout:  time.Second,
-	}
-
-	for _, opt := range opts {
-		opt(options)
-	}
-
-	if err := validateOptions(options); err != nil {
-		panic(err)
-	}
-
-	return options
 }
