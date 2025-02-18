@@ -11,10 +11,10 @@ import (
 )
 
 var _ = Describe("Buffer", func() {
-	var flusher *MockFlusher
+	var flusher *MockFlusher[any]
 
 	BeforeEach(func() {
-		flusher = NewMockFlusher()
+		flusher = NewMockFlusher[any]()
 	})
 
 	Context("Constructor", func() {
@@ -26,6 +26,18 @@ var _ = Describe("Buffer", func() {
 
 			// assert
 			Expect(sut).NotTo(BeNil())
+		})
+
+		Context("generics", func() {
+			It("allows for generic types", func() {
+				_, err := buffer.New[int]().
+					WithSize(10).
+					WithFlusher(NewMockFlusher[int]()).
+					Consume()
+
+				// we expect no error
+				Expect(err).To(BeNil())
+			})
 		})
 
 		Context("invalid options", func() {
@@ -337,19 +349,19 @@ var _ = Describe("Buffer", func() {
 })
 
 type (
-	MockFlusher struct {
-		Done chan *WriteCall
+	MockFlusher[T any] struct {
+		Done chan *WriteCall[T]
 		Func func()
 	}
 
-	WriteCall struct {
+	WriteCall[T any] struct {
 		Time  time.Time
-		Items []interface{}
+		Items []T
 	}
 )
 
-func (flusher *MockFlusher) Write(items []interface{}) {
-	call := &WriteCall{
+func (flusher *MockFlusher[T]) Write(items []T) {
+	call := &WriteCall[T]{
 		Time:  time.Now(),
 		Items: items,
 	}
@@ -361,8 +373,8 @@ func (flusher *MockFlusher) Write(items []interface{}) {
 	flusher.Done <- call
 }
 
-func NewMockFlusher() *MockFlusher {
-	return &MockFlusher{
-		Done: make(chan *WriteCall, 1),
+func NewMockFlusher[T any]() *MockFlusher[T] {
+	return &MockFlusher[T]{
+		Done: make(chan *WriteCall[T], 1),
 	}
 }
