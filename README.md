@@ -34,16 +34,22 @@ import (
 )
 
 func main() {
-  buff := buffer.New(
-    // buffer can hold up to 5 items
-    buffer.WithSize(5),
-    // call this function when the buffer needs flushing
-    buffer.WithFlusher(buffer.FlusherFunc(func(items []interface{}) {
-      for _, item := range items {
-        println(item.(string))
-      }
-    })),
-  )
+  buff, err := buffer.New[any]().
+      // buffer can hold up to 5 items
+      buffer.WithSize(5).
+      // call this function when the buffer needs flushing
+      buffer.WithFlusher(buffer.FlusherFunc(func(items []interface{}) {
+        for _, item := range items {
+          println(item.(string))
+        }
+      })).
+      // Consume
+      Consume()
+
+  if err != nil {
+    panic(err)
+  }
+
   // ensure the buffer
   defer buff.Close()
 
@@ -72,19 +78,25 @@ import (
 )
 
 func main() {
-  buff := buffer.New(
+  buff, err := buffer.New[any]().
     // buffer can hold up to 5 items
-    buffer.WithSize(5),
+    buffer.WithSize(5).
     // buffer will be flushed every second, regardless of
     // how many items were pushed
-    buffer.WithFlushInterval(time.Second),
+    buffer.WithFlushInterval(time.Second).
     // call this function when the buffer needs flushing
     buffer.WithFlusher(buffer.FlusherFunc(func(items []interface{}) {
       for _, item := range items {
         println(item.(string))
       }
-    })),
-  )
+    })).
+    // Consume
+    Consume()
+
+  if err != nil {
+    panic(err)
+  }
+
   defer buff.Close()
 
   buff.Push("item 1")
@@ -110,16 +122,22 @@ import (
 )
 
 func main() {
-  buff := buffer.New(
+  buff := buffer.New[any]().
     // buffer can hold up to 5 items
-    buffer.WithSize(5),
+    buffer.WithSize(5).
     // call this function when the buffer needs flushing
     buffer.WithFlusher(buffer.FlusherFunc(func(items []interface{}) {
       for _, item := range items {
         println(item.(string))
       }
-    })),
-  )
+    })).
+    // Consume
+    Consume()
+
+  if err != nil {
+    panic(err)
+  }
+
   defer buff.Close()
 
   buff.Push("item 1")

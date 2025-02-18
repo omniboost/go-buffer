@@ -12,10 +12,10 @@ import (
 var _ = Describe("Options", func() {
 	It("sets up size", func() {
 		// arrange
-		opts := &buffer.Buffer[any]{}
+		opts := buffer.New[any]()
 
 		// act
-		buffer.WithSize(10)(opts)
+		opts = opts.WithSize(10)
 
 		// assert
 		Expect(opts.Size).To(BeIdenticalTo(uint(10)))
@@ -23,11 +23,11 @@ var _ = Describe("Options", func() {
 
 	It("sets up flusher", func() {
 		// arrange
-		opts := &buffer.Buffer[any]{}
+		opts := buffer.New[any]()
 		flusher := func(items []interface{}) {}
 
 		// act
-		buffer.WithFlusher(buffer.FlusherFunc[any](flusher))(opts)
+		opts = opts.WithFlusher(buffer.FlusherFunc[any](flusher))
 
 		// assert
 		Expect(opts.Flusher).NotTo(BeNil())
@@ -35,10 +35,10 @@ var _ = Describe("Options", func() {
 
 	It("sets up flush interval", func() {
 		// arrange
-		opts := &buffer.Buffer[any]{}
+		opts := buffer.New[any]()
 
 		// act
-		buffer.WithFlushInterval(5 * time.Second)(opts)
+		opts = opts.WithFlushInterval(5 * time.Second)
 
 		// assert
 		Expect(opts.FlushInterval).To(Equal(5 * time.Second))
@@ -46,10 +46,10 @@ var _ = Describe("Options", func() {
 
 	It("sets up push timeout", func() {
 		// arrange
-		opts := &buffer.Buffer[any]{}
+		opts := buffer.New[any]()
 
 		// act
-		buffer.WithPushTimeout(10 * time.Second)(opts)
+		opts = opts.WithPushTimeout(10 * time.Second)
 
 		// assert
 		Expect(opts.PushTimeout).To(Equal(10 * time.Second))
@@ -57,10 +57,10 @@ var _ = Describe("Options", func() {
 
 	It("sets up flush timeout", func() {
 		// arrange
-		opts := &buffer.Buffer[any]{}
+		opts := buffer.New[any]()
 
 		// act
-		buffer.WithFlushTimeout(15 * time.Second)(opts)
+		opts = opts.WithFlushTimeout(15 * time.Second)
 
 		// assert
 		Expect(opts.FlushTimeout).To(Equal(15 * time.Second))
@@ -68,10 +68,10 @@ var _ = Describe("Options", func() {
 
 	It("sets up close timeout", func() {
 		// arrange
-		opts := &buffer.Buffer[any]{}
+		opts := buffer.New[any]()
 
 		// act
-		buffer.WithCloseTimeout(3 * time.Second)(opts)
+		opts = opts.WithCloseTimeout(3 * time.Second)
 
 		// assert
 		Expect(opts.CloseTimeout).To(Equal(3 * time.Second))

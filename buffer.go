@@ -173,11 +173,16 @@ func New[T any](opts ...Option[T]) *Buffer[T] {
 		opt(buffer)
 	}
 
-	if err := validateBuffer(buffer); err != nil {
-		panic(err)
+	return buffer
+}
+
+func (b *Buffer[T]) Consume() (*Buffer[T], error) {
+	err := validateBuffer(b)
+	if err != nil {
+		return b, err
 	}
 
-	go buffer.consume()
+	go b.consume()
 
-	return buffer
+	return b, nil
 }

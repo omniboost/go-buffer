@@ -10,10 +10,12 @@ func BenchmarkBuffer(b *testing.B) {
 	noop := buffer.FlusherFunc[any](func([]any) {})
 
 	b.Run("push only", func(b *testing.B) {
-		sut := buffer.New(
-			buffer.WithSize(uint(b.N)+1),
-			buffer.WithFlusher(noop),
-		)
+		sut := buffer.New[any]().
+			WithSize(10)
+
+		// 	buffer.WithSize(uint(b.N)+1),
+		// 	buffer.WithFlusher(noop),
+		// )
 		defer sut.Close()
 
 		for i := 0; i < b.N; i++ {
@@ -25,10 +27,10 @@ func BenchmarkBuffer(b *testing.B) {
 	})
 
 	b.Run("push and flush", func(b *testing.B) {
-		sut := buffer.New(
-			buffer.WithSize(1),
-			buffer.WithFlusher(noop),
-		)
+		sut := buffer.New[any]().
+			WithSize(1).
+			WithFlusher(noop)
+
 		defer sut.Close()
 
 		for i := 0; i < b.N; i++ {
