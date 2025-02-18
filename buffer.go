@@ -37,6 +37,20 @@ type (
 // It returns an ErrTimeout if if cannot be performed in a timely fashion, and
 // an ErrClosed if the buffer has been closed.
 func (buffer *Buffer[T]) Push(item T) error {
+	if !buffer.IsIntialized() {
+		// validate the options
+		err := buffer.Validate()
+		if err != nil {
+			return err
+		}
+
+		// initialize the buffer
+		err = buffer.initialize()
+		if err != nil {
+			return err
+		}
+	}
+
 	if buffer.closed() {
 		return ErrClosed
 	}
@@ -155,11 +169,6 @@ func newTicker(interval time.Duration) (<-chan time.Time, func()) {
 // New creates a new buffer instance with the provided options.
 func New[T any](opts ...Option[T]) *Buffer[T] {
 	buffer := &Buffer[T]{
-		dataCh:  make(chan T),
-		flushCh: make(chan struct{}),
-		closeCh: make(chan struct{}),
-		doneCh:  make(chan struct{}),
-
 		// Options
 		Size:          0,
 		Flusher:       nil,
@@ -176,13 +185,26 @@ func New[T any](opts ...Option[T]) *Buffer[T] {
 	return buffer
 }
 
-func (b *Buffer[T]) Consume() (*Buffer[T], error) {
+func (b *Buffer[T]) Validate() error {
+	return validateBuffer(b)
+}
+
+func (b *Buffer[T]) IsIntialized() bool {
+	return b.dataCh != nil
+}
+
+func (b *Buffer[T]) initialize() error {
 	err := validateBuffer(b)
 	if err != nil {
-		return b, err
+		return err
 	}
+
+	b.dataCh = make(chan T)
+	b.flushCh = make(chan struct{})
+	b.closeCh = make(chan struct{})
+	b.doneCh = make(chan struct{})
 
 	go b.consume()
 
-	return b, nil
+	return nil
 }
