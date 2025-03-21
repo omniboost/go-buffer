@@ -59,7 +59,7 @@ func (buffer *Buffer[T]) Push(item T) error {
 	case buffer.dataCh <- item:
 		return nil
 	case <-time.After(buffer.PushTimeout):
-		return ErrTimeout
+		return errors.Join(errors.New("buffer is full"), ErrTimeout)
 	}
 }
 
@@ -76,7 +76,7 @@ func (buffer *Buffer[T]) Flush() error {
 	case buffer.flushCh <- struct{}{}:
 		return nil
 	case <-time.After(buffer.FlushTimeout):
-		return ErrTimeout
+		return errors.Join(errors.New("failed to flush buffer within flush timeout"), ErrTimeout)
 	}
 }
 
@@ -97,7 +97,7 @@ func (buffer *Buffer[T]) Close() error {
 	case buffer.closeCh <- struct{}{}:
 		// noop
 	case <-time.After(buffer.CloseTimeout):
-		return ErrTimeout
+		return errors.Join(errors.New("failed to close buffer within close timeout"), ErrTimeout)
 	}
 
 	select {
@@ -107,7 +107,7 @@ func (buffer *Buffer[T]) Close() error {
 		close(buffer.closeCh)
 		return nil
 	case <-time.After(buffer.CloseTimeout):
-		return ErrTimeout
+		return errors.Join(errors.New("failed to close buffer within close timeout"), ErrTimeout)
 	}
 }
 
